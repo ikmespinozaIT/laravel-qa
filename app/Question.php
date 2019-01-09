@@ -8,15 +8,20 @@ class Question extends Model
 {
 
   protected $fillable = ['title', 'body'];
-  
-  public function user() 
-  {
-    return $this->belongsTo(User::class);
-  }
 
   public function answers()
   {
     return $this->hasMany(Answer::class);
+  }
+
+  public function favorites()
+  {
+      return $this->belongsToMany(User::class, 'favorites')->withTimeStamps();
+  }
+  
+  public function user() 
+  {
+    return $this->belongsTo(User::class);
   }
 
   public function acceptBestAnswer(Answer $answer)
@@ -25,20 +30,35 @@ class Question extends Model
     $this->save();
   }
 
+  public function isFavorited()
+  {
+    return $this->favorites()->where('user_id', auth()->id())->count() > 0;
+  }
+
   public function setTitleAttribute($value)
   {
     $this->attributes['title'] = $value;
     $this->attributes['slug'] = str_slug($value);
   }
 
-  public function getUrlAttribute()
+  public function getBodyHtmlAttribute()
   {
-    return route('questions.show', $this->slug);
+    return \Parsedown::instance()->text($this->body);
   }
 
   public function getCreatedDateAttribute()
   {
     return $this->created_at->diffForHumans();
+  }
+
+  public function getFavoritesCountAttribute()
+  {
+    return $this->favorites->count();
+  }
+  
+  public function getIsFavoritedAttribute()
+  {
+    return $this->isFavorited();
   }
 
   public function getStatusAttribute()
@@ -53,9 +73,9 @@ class Question extends Model
     return "unanswered";
   }
 
-  public function getBodyHtmlAttribute()
+  public function getUrlAttribute()
   {
-    return \Parsedown::instance()->text($this->body);
+    return route('questions.show', $this->slug);
   }
 
 }
