@@ -19,13 +19,30 @@
   
                   <div class="media">
                     <div class="d-flex flex-column vote-controls">
-                      <a href="" class="vote-up" title="This question is useful">
+                      <a href=""
+                        class="vote-up {{ Auth::guest() ? 'off' : '' }}" 
+                        title="This question is useful"
+                        onclick="event.preventDefault(); document.getElementById('up-vote-question-{{ $question->id }}').submit();">
                         <i class="fas fa-caret-up fa-3x"></i>
-                      </a>
-                      <span class="votes-count">77</span>
-                      <a href="" class="vote-down off" title="This question is not useful">
+                      </a>                    
+                      <form id="up-vote-question-{{ $question->id }}" action="/questions/{{ $question->id }}/vote" method="post" style="display:none">
+                        @csrf
+                        <input type="hidden" value="1" name="vote">
+                      </form>
+
+                      <span class="votes-count">{{ $question->votes_count }}</span>
+
+                      <a href="" 
+                        class="vote-down {{ Auth::guest() ? 'off' : '' }}" 
+                        title="This question is not useful"
+                        onclick="event.preventDefault(); document.getElementById('down-vote-question-{{ $question->id }}').submit();">
                         <i class="fas fa-caret-down fa-3x"></i>
-                      </a>
+                      </a>                  
+                      <form id="down-vote-question-{{ $question->id }}" action="/questions/{{ $question->id }}/vote" method="post" style="display:none">
+                        @csrf
+                        <input type="hidden" value="-1" name="vote">
+                      </form>
+                      
                       <a href="" 
                         class="favorite mt-2 {{ Auth::guest() ? 'off' : ($question->is_favorited ? 'favorited' : '') }}" 
                         title="Click to mark as favorite question (Click again to undo)"
