@@ -15,6 +15,16 @@ class Question extends Model
     return $this->hasMany(Answer::class);
   }
 
+  private function bodyHtml()
+  {
+    return \Parsedown::instance()->text($this->body);
+  }
+
+  public function excerpt($len)
+  {
+    return str_limit(strip_tags($this->bodyHtml()), $len);
+  }
+
   public function favorites()
   {
       return $this->belongsToMany(User::class, 'favorites')->withTimeStamps();
@@ -41,6 +51,11 @@ class Question extends Model
     return $this->favorites()->where('user_id', auth()->id())->count() > 0;
   }
 
+  // public function setBodyAttribute($value)
+  // {
+  //   $this->attributes['body'] = clean($value);
+  // }
+
   public function setTitleAttribute($value)
   {
     $this->attributes['title'] = $value;
@@ -49,12 +64,17 @@ class Question extends Model
 
   public function getBodyHtmlAttribute()
   {
-    return \Parsedown::instance()->text($this->body);
+    return clean($this->bodyHtml());
   }
 
   public function getCreatedDateAttribute()
   {
     return $this->created_at->diffForHumans();
+  }
+
+  public function getExcerptAttribute()
+  {
+    return $this->excerpt(250);
   }
 
   public function getFavoritesCountAttribute()
