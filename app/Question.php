@@ -10,6 +10,8 @@ class Question extends Model
 
   protected $fillable = ['title', 'body'];
 
+  protected $appends = ['created_date'];
+
   public function answers()
   {
     return $this->hasMany(Answer::class)->orderBy('votes_count', 'DESC');
