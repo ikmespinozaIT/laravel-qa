@@ -24,6 +24,16 @@ class Answer extends Model
       return $this->morphToMany(User::class, 'votable');
     }
 
+    public function downVotes()
+    {
+      return $this->votes()->wherePivot('vote', -1);
+    }
+  
+    public function upVotes()
+    {
+      return $this->votes()->wherePivot('vote', 1);
+    }
+
     public function getBodyHtmlAttribute()
     {
       return \Parsedown::instance()->text($this->body);
@@ -58,7 +68,7 @@ class Answer extends Model
         });
 
         static::saved(function($answer) {
-            echo "Answer saved\n";
+            // echo "Answer saved\n";
         });
 
         static::deleted(function($answer) {
