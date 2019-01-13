@@ -15,10 +15,10 @@ class UsersQuestionsAnswersTableSeeder extends Seeder
         \DB::table('questions')->delete();
         \DB::table('users')->delete();
 
-        factory(App\User::class, 3)->create()->each(function($user) {
+        factory(App\User::class, 7)->create()->each(function($user) {
             $user->questions()
                  ->saveMany(
-                     factory(App\Question::class, rand(1, 5))->make()
+                     factory(App\Question::class, rand(1, 7))->make()
                  )
                  ->each(function($q) {
                     $q->answers()->saveMany(
